@@ -1,0 +1,58 @@
+diff --git a/containers/piccolo-pull.service b/containers/piccolo-pull.service
+new file mode 100644
+index 0000000..d96d767
+--- /dev/null
++++ b/containers/piccolo-pull.service
+@@ -0,0 +1,12 @@
++[Unit]
++Description=Piccolo image pull on boot time
++After=sockets.target
++Before=piccolo.service
++
++[Service]
++Type=simple
++ExecStart=/bin/sh /root/piccolo_images/piccolo.sh
++
++[Install]
++WantedBy=multi-user.target
++
+diff --git a/containers/piccolo.sh b/containers/piccolo.sh
+new file mode 100644
+index 0000000..33e484a
+--- /dev/null
++++ b/containers/piccolo.sh
+@@ -0,0 +1,3 @@
++/usr/bin/podman pull oci-archive:/root/piccolo_images/etcd.tar
++/usr/bin/podman pull oci-archive:/root/piccolo_images/piccolo.tar
++
+diff --git a/containers/piccolo.yaml b/containers/piccolo.yaml
+index 9327aff..a629127 100644
+--- a/containers/piccolo.yaml
++++ b/containers/piccolo.yaml
+@@ -11,7 +11,7 @@ spec:
+   hostPid: true
+   containers:
+   - name: api-server
+-    image: ghcr.io/eclipse-pullpiri/pullpiri:0.1.0
++    image: localhost/piccolo:1.0
+     command: ["/piccolo/api-server"]
+     volumeMounts:
+     - name: piccolo-yaml
+@@ -19,7 +19,7 @@ spec:
+     - name: config-path
+       mountPath: /piccolo/settings.yaml
+   - name: statemanager
+-    image: ghcr.io/eclipse-pullpiri/pullpiri:0.1.0
++    image: localhost/piccolo:1.0
+     command: ["/piccolo/statemanager"]
+     volumeMounts:
+     - name: piccolo-yaml
+@@ -38,7 +38,7 @@ spec:
+     - name: etcd-data
+       mountPath: /etcd-data
+   - name: gateway
+-    image: ghcr.io/eclipse-pullpiri/pullpiri:0.1.0
++    image: localhost/piccolo:1.0
+     command: ["/piccolo/gateway"]
+     env:
+     - name: RUST_BACKTRACE
